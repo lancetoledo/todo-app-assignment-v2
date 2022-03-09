@@ -1,23 +1,83 @@
-import logo from './logo.svg';
 import './App.css';
+import { TaskInput } from './components/TaskInput';
+import { TaskList } from './components/TaskList';
+import { useState, useEffect } from 'react'
+
+
+/* APP TODOS
+How do we GET a collection from our Firestore db?
+
+- Import onSnapshot, colelction from firebase/firestore
+- Import db from './utils/firebase
+- Fetch db from firestore
+- In useEffect() use onSnapshot(collectionRef, ()=>)
+- map through snapshot data and setFiltered Tasks to the snapshot.data()
+- Don't forget when you map through add the id
+*/
+
+
+// Hardcoded Tasks Data that we will ask Firebase for instead
+const data = [
+  { id: 31, text: "Finish contacts hw", status: false },
+  { id: 0, text: "Study react hooks", status: false },
+  { id: 9, text: "Finish Clever programmer challenge", status: false },
+  { id: 21, text: "Run 1 mile", status: false },
+  { id: 5, text: "Finish errands", status: false },
+  { id: 13, text: "Complete Todo App", status: false },
+  
+];
+
+
 
 function App() {
+  const [tasks, setTasks] = useState(data)
+  const [filteredTasks, setFilteredTasks] = useState(tasks)
+  const [filterStatus, setFilterStatus] = useState("all")
+
+
+
+  useEffect(()=> {
+    const handleFilter = () => {
+      if(filterStatus === "active") {
+        setFilteredTasks(tasks.filter((task)=> task.status === false))
+      }
+      else if(filterStatus === "completed") {
+        setFilteredTasks(tasks.filter((task)=> task.status === true))
+      }
+      else {
+        setFilteredTasks(tasks)
+      }
+    }
+
+    handleFilter()
+  },[tasks,filterStatus])
+
+
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+
+      <div className='container'>
+
+        <div className='header'>
+          <h1>TODO</h1>
+          <img src='./images/icon-sun.svg' alt='sun'/>
+        </div>
+
+        {/* ADD TO TASK INPUT COMPONENT */}
+       <TaskInput tasks = {tasks} setTasks = {setTasks}/>
+
+        {/* MAKE A TASK LIST COMPONENT */}
+       <TaskList 
+        tasks = {tasks}
+        setTasks = {setTasks}
+        filterStatus = {filterStatus}
+        setFilterStatus = {setFilterStatus}
+        filteredTasks = {filteredTasks}
+        />
+      </div>
+
     </div>
   );
 }
